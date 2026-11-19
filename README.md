@@ -1,8 +1,8 @@
 # MIMO. — Pet Care (projeto demonstrativo)
 
-Landing page React + Vite para uma **marca fictícia** de serviços pet. Criado como demonstração de design e desenvolvimento web; **não representa um estabelecimento real**.
+Experiência conceitual criada em React + Vite com layout responsivo, filtros de galeria, cards interativos de serviços, perguntas expansíveis e formulário de **simulação local**. Nenhuma reserva é feita nem informações são enviadas para servidores.
 
-## Rodar localmente
+## Como executar
 
 ```bash
 npm install
@@ -11,24 +11,12 @@ npm run lint
 npm run build
 ```
 
-O projeto foi pensado para a estrutura padrão `npm create vite@latest mimo-pet -- --template react`.
+## Fotografia
 
-## Funcionalidades
+As imagens da versão editorial são carregadas externamente do Unsplash (`images.unsplash.com`) e dependem de conexão com a internet. São fotografias ilustrativas, não retratos de pets/clientes do estabelecimento. Para um projeto comercial, substitua por fotografias próprias/contratadas, otimizadas e hospedadas localmente.
 
-- Seleção de cuidados e painel de detalhes atualizável;
-- Galeria ilustrada com filtros "Todos", "Cães" e "Gatos";
-- Formulário de **simulação** de solicitação com resumo local;
-- FAQ expansível, menu responsivo, âncoras e estados de interação;
-- Acessibilidade básica e respeito a `prefers-reduced-motion`.
+Os ícones SVG do conceito anterior foram mantidos como arquivos em `public/illustrations`, mas não são mais utilizados pelas seções principais.
 
-## Sobre os dados
+## Nota sobre o conceito
 
-O formulário não envia requisições, não usa banco de dados nem persiste as informações. O resumo é gerado apenas no estado React. Não há atendimento, reserva ou WhatsApp real. Conteúdos e marca são fictícios.
-
-## Identidade
-
-Tipografia Outfit e DM Sans (Google Fonts com fallback); ilustrações SVG locais originais em `public/illustrations` e favicon SVG próprio. O site não depende de fotos de terceiros nem de recursos gráficos externos para funcionar.
-
-## Próxima etapa
-
-Refinar o design e validar acessibilidade/performance em dispositivos reais; posteriormente adicionar funcionalidades como seleção por etapa ou páginas de serviços se fizer sentido ao projeto comercial. Ao publicar a demonstração, manter visível que o estabelecimento é fictício.
+MIMO. é uma marca fictícia de demonstração. Serviços, imagens, mensagens e formulário não representam atendimento real.
