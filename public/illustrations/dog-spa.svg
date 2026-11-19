@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 620" role="img" aria-label="Ilustração de pet">
+<defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="2" dy="16" stdDeviation="13" flood-color="#42544c" flood-opacity=".13"/></filter><linearGradient id="fur" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#DED0BD"/><stop offset="1" stop-color="#AC9177"/></linearGradient></defs>
+<g opacity=".65"><circle cx="82" cy="210" r="15" fill="#fffdf7"/><circle cx="485" cy="285" r="11" fill="#fffdf7"/><path d="m415 105 10 25 24 10-24 11-10 25-11-25-24-11 24-10Z" fill="#fffdf7"/></g>
+<g filter="url(#s)"><ellipse cx="292" cy="538" rx="183" ry="103" fill="url(#fur)"/><path d="M157 487c-3-70 46-118 134-118s139 48 139 118" fill="url(#fur)"/><ellipse cx="171" cy="519" rx="45" ry="41" fill="#DED0BD"/><ellipse cx="407" cy="519" rx="45" ry="41" fill="#DED0BD"/>
+<path d="M168 232C96 178 92 265 117 329c19 46 66 69 94 42Z" fill="#AC9177"/><path d="M410 232c69-56 76 27 49 94-21 49-63 65-90 45Z" fill="#AC9177"/>
+<ellipse cx="292" cy="308" rx="159" ry="168" fill="url(#fur)"/><path d="M201 338q-54 10-47 69c2 62 72 88 135 89 68 1 137-28 140-90 2-49-34-68-48-68" fill="#DED0BD"/>
+<ellipse cx="234" cy="297" rx="11" ry="15" fill="#322b2b"/><ellipse cx="349" cy="297" rx="11" ry="15" fill="#322b2b"/><circle cx="237" cy="292" r="3" fill="#fff"/><circle cx="352" cy="292" r="3" fill="#fff"/>
+<ellipse cx="292" cy="356" rx="46" ry="32" fill="#fff0dc"/><path d="M265 343q27-21 55 0c5 12-17 28-27 28-14 0-32-15-28-28Z" fill="#4a3530"/><path d="M291 370v15m0 0q-18 23-38 0m38 0q20 22 40 0" fill="none" stroke="#684339" stroke-width="7" stroke-linecap="round"/>
+<ellipse cx="214" cy="351" rx="26" ry="13" fill="#e99881" opacity=".55"/><ellipse cx="373" cy="351" rx="26" ry="13" fill="#e99881" opacity=".55"/>
+<path d="M254 412q41 34 77 0" fill="none" stroke="#8a5944" stroke-width="6" stroke-linecap="round"/>
+</g><g><circle cx="140" cy="153" r="32" fill="#fff" opacity=".9"/><circle cx="140" cy="153" r="22" fill="#cfe7e0" opacity=".6"/><circle cx="452" cy="218" r="25" fill="#fff" opacity=".85"/><circle cx="450" cy="170" r="16" fill="#fff" opacity=".85"/><circle cx="200" cy="110" r="18" fill="#fff" opacity=".9"/><circle cx="390" cy="100" r="12" fill="#fff" opacity=".85"/></g></svg>
