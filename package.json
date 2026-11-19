@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test tests/*.test.js",
+    "images:sync": "node scripts/sincronizar-fotos.mjs",
+    "clean:legacy": "node scripts/limpar-legado.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",

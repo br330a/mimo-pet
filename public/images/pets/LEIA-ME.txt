@@ -1,0 +1,2 @@
+As seis fotos serão criadas nesta pasta pelo comando npm run images:sync.
+As URLs originais e as condições de uso estão documentadas em scripts/photo-sources.json e README.md.

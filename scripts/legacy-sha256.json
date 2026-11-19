@@ -1,0 +1,10 @@
+{
+  "public/icons.svg": "b45fa506195cfcdef406ba9f0c77b36ddc1a7c224040926ec70abc2fdea7b93a",
+  "public/illustrations/cat-cozy.svg": "d42f8fbec307632480a95941f9ac04ecb8e660dedf342dcea006ad2fc3d91e18",
+  "public/illustrations/cat-curious.svg": "def5b6075a897521fd8c9959df845820f52dce7d7333aec33a9ff83a7e8ccd19",
+  "public/illustrations/dog-happy.svg": "7b6a7e7330b5b889ec14cbcdddc028d5da09209aeb2a65a5c04a4309043cec63",
+  "public/illustrations/dog-spa.svg": "fb506a04aed2a8fafe21fd25be5979450e6929c97d13bdce55ad937bef9420c2",
+  "src/assets/hero.png": "881ffbcaafc212e49addad08846a5b82761355fa20624253af3477ba33262c5c",
+  "src/assets/react.svg": "35ef61ed53b323ae94a16a8ec659b3d0af3880698791133f23b084085ab1c2e5",
+  "src/assets/vite.svg": "5be21acd42eb7b896e517f4e0f0f11eb5c5d9e54fbbcebe9453f033008fcca6f"
+}

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { cartItems, cartTotals, changeCartQuantity, searchProducts } from '../utils/shop'
 import ProductArtwork from './ProductArtwork'
 import './ShopSection.css'
 
@@ -13,16 +15,12 @@ export default function ShopSection({ products, categories, formatMoney, Icon })
   const panelRef = useRef(null)
   const closeRef = useRef(null)
   const returnRef = useRef(null)
-  const items = products.filter((product) => (filter === 'todos' || product.category === filter) && `${product.name} ${product.detail} ${categories.find((category) => category.id === product.category)?.label ?? ''}`.toLocaleLowerCase('pt-BR').includes(search.trim().toLocaleLowerCase('pt-BR')))
-  const selected = products.filter((product) => cart[product.id] > 0).map((product) => ({ ...product, quantity: cart[product.id] }))
-  const count = selected.reduce((total, item) => total + item.quantity, 0)
-  const total = selected.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const items = searchProducts(products, categories, filter, search)
+  const selected = cartItems(products, cart)
+  const { count, total } = cartTotals(selected)
 
   function changeQty(id, delta) {
-    setCart((previous) => {
-      const quantity = Math.max(0, Math.min(20, (previous[id] ?? 0) + delta))
-      return { ...previous, [id]: quantity }
-    })
+    setCart((previous) => changeCartQuantity(previous, id, delta))
     if (delta > 0) setToast({ name: products.find((product) => product.id === id)?.name ?? 'Produto' })
     setReview(false)
   }
@@ -51,18 +49,31 @@ export default function ShopSection({ products, categories, formatMoney, Icon })
   useEffect(() => {
     if (!open) return undefined
     const previousOverflow = document.body.style.overflow
+    const root = document.getElementById('root')
+    const previousInert = root?.inert ?? false
     document.body.style.overflow = 'hidden'
+    // O modal é renderizado no body (portal); o conteúdo da página não recebe foco.
+    if (root) root.inert = true
     closeRef.current?.focus()
+    const focusables = () => [...(panelRef.current?.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])') ?? [])]
+      .filter((node) => node.getClientRects().length > 0)
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') { event.preventDefault(); hideCart(); return }
-      if (event.key !== 'Tab' || !panelRef.current) return
-      const nodes = [...panelRef.current.querySelectorAll('button:not([disabled]), a[href], input:not([disabled])')].filter((node) => node.getClientRects().length)
-      if (!nodes.length) return
-      if (event.shiftKey && document.activeElement === nodes[0]) { event.preventDefault(); nodes.at(-1).focus() }
-      if (!event.shiftKey && document.activeElement === nodes.at(-1)) { event.preventDefault(); nodes[0].focus() }
+      if (event.key !== 'Tab') return
+      const nodes = focusables()
+      if (!nodes.length) { event.preventDefault(); closeRef.current?.focus(); return }
+      const first = nodes[0]
+      const last = nodes.at(-1)
+      if (!panelRef.current?.contains(document.activeElement)) { event.preventDefault(); first.focus(); return }
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
     document.addEventListener('keydown', handleKeyDown)
-    return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKeyDown) }
+    return () => {
+      document.body.style.overflow = previousOverflow
+      if (root) root.inert = previousInert
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [open, hideCart])
 
   return <>
@@ -87,10 +98,10 @@ export default function ShopSection({ products, categories, formatMoney, Icon })
 
     {toast && !open && <div className="shop-toast" role="status" aria-live="polite"><span className="shop-toast-icon"><Icon name="check" size={18}/></span><div><strong>Adicionado à sacola</strong><small>{toast.name}</small></div><button className="shop-toast-view" type="button" onClick={showCart}>Ver sacola</button><button className="shop-toast-close" type="button" onClick={() => setToast(null)} aria-label="Dispensar aviso"><Icon name="close" size={15}/></button></div>}
     {count > 0 && !open && <button className="cart-floating" type="button" onClick={showCart} aria-label={`Ver sacola com ${count} itens`}><Icon name="bag" size={19}/><span>Ver sacola</span><b>{count}</b></button>}
-    {open && <div className="cart-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) hideCart() }}><aside role="dialog" aria-modal="true" aria-labelledby="cart-title" className="cart-drawer" ref={panelRef}>
+    {open && createPortal(<div className="cart-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) hideCart() }}><aside role="dialog" aria-modal="true" aria-labelledby="cart-title" className="cart-drawer" ref={panelRef}>
       <div className="cart-header"><div><span>MIMO. / SHOP</span><h2 id="cart-title">{review ? 'Resumo da simulação' : 'Sua sacola'}</h2><small className="cart-header-count">{count} {count === 1 ? "item" : "itens"} · sem compras reais</small></div><button ref={closeRef} type="button" onClick={hideCart} aria-label="Fechar sacola"><Icon name="close" size={23}/></button></div>
       {review ? <div className="cart-review"><div className="cart-review-mark"><Icon name="check" size={32}/></div><h3 ref={reviewHeadingRef} tabIndex="-1">Tudo organizado!</h3><p>Veja como ficaria um resumo de pedido, antes de seguir para um checkout real.</p><ul>{selected.map((item) => <li key={item.id}><span>{item.quantity}× {item.name}</span><strong>{formatMoney(item.quantity * item.price)}</strong></li>)}</ul><div className="cart-review-total"><span>Total ilustrativo</span><strong>{formatMoney(total)}</strong></div><p className="cart-demo-note">Nenhuma compra foi realizada. Não há pagamentos, reservas de estoque nem envio de dados.</p><button className="button button-dark" type="button" onClick={() => setReview(false)}>Voltar à sacola <Icon name="arrow" size={16}/></button></div>
         : <><div className="cart-list">{selected.length ? selected.map((item) => <div className="cart-item" key={item.id}><div className={`cart-thumb tone-${item.tint}`}><ProductArtwork type={item.type} name={item.name}/></div><div className="cart-item-copy"><strong>{item.name}</strong><small>{item.detail}</small><span>{formatMoney(item.price)}</span><div className="cart-quantity"><button type="button" onClick={() => changeQty(item.id,-1)} aria-label={`Reduzir quantidade de ${item.name}`}><Icon name="minus" size={15}/></button><span aria-label={`${item.quantity} unidades`}>{item.quantity}</span><button type="button" onClick={() => changeQty(item.id,1)} disabled={item.quantity >= 20} aria-label={`Aumentar quantidade de ${item.name}`}><Icon name="plus" size={15}/></button></div></div><button type="button" className="cart-remove" onClick={() => changeQty(item.id,-item.quantity)} aria-label={`Remover ${item.name}`}><Icon name="trash" size={17}/></button></div>) : <div className="cart-empty"><Icon name="bag" size={33}/><h3>Sua sacola está vazia</h3><p>Adicione alguns favoritos e monte um pedido demonstrativo.</p><button type="button" className="button button-dark" onClick={hideCart}>Explorar produtos <Icon name="arrow" size={17}/></button></div>}</div>{selected.length > 0 && <div className="cart-footer"><div><span>Subtotal ilustrativo</span><strong>{formatMoney(total)}</strong></div><small>Sem frete, pagamento ou compra de verdade.</small><button className="button button-dark" disabled={!selected.length} type="button" onClick={() => {setReview(true);panelRef.current?.scrollTo({top:0,behavior:'smooth'})}}>Simular pedido <Icon name="arrow" size={18}/></button></div>}</>}
-    </aside></div>}
+    </aside></div>, document.body)}
   </>
 }

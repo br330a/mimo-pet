@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import { createAvailableDays, slotsForDay, validateBooking } from './utils/booking'
 import ShopSection from './components/ShopSection'
 
+// Após `npm run images:sync`, todas as fotos são servidas pelo próprio site.
 const photos = {
-  hero: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1200&q=85',
-  story: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1200&q=85',
-  dogOne: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=850&q=82',
-  catOne: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=850&q=82',
-  dogTwo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=850&q=82',
-  catTwo: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=850&q=82',
+  hero: '/images/pets/hero.webp',
+  story: '/images/pets/story.webp',
+  dogOne: '/images/pets/dog-one.webp',
+  catOne: '/images/pets/cat-one.webp',
+  dogTwo: '/images/pets/dog-two.webp',
+  catTwo: '/images/pets/cat-two.webp',
 }
 
 const services = [
@@ -47,19 +49,8 @@ const products = [
 ]
 
 const formatMoney = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
-const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-const availableDays = (() => {
-  const days = []
-  const today = new Date()
-  for (let offset = 1; offset <= 15 && days.length < 8; offset += 1) {
-    const day = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset)
-    if (day.getDay() !== 0) days.push({ id: dateKey(day), weekday: new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(day).replace('.', ''), day: new Intl.DateTimeFormat('pt-BR', { day: '2-digit' }).format(day), month: new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(day).replace('.', '') })
-  }
-  return days
-})()
-const slotHours = ['09:00', '10:30', '11:30', '13:30', '15:00', '16:30']
-// Disponibilidade 100% fictícia: apenas uma amostra para demonstrar a interface.
-const slotsForDay = (id) => slotHours.map((time, index) => ({ time, available: ((Number(id.slice(-2)) + index * 3) % 5) !== 0 }))
+// Datas e disponibilidade fictícia implementadas em src/utils/booking.js.
+const availableDays = createAvailableDays()
 
 const gallery = [
   { id: 1, title: 'Beleza em cada detalhe', type: 'caes', label: 'Cães', image: photos.dogOne, color: 'peach' },
@@ -122,6 +113,7 @@ function App() {
   const [galleryFilter, setGalleryFilter] = useState('todos')
   const [form, setForm] = useState(initialForm)
   const [summary, setSummary] = useState(false)
+  const [formError, setFormError] = useState('')
   const summaryRef = useRef(null)
   const serviceDetailsRef = useRef(null)
   const active = services.find((service) => service.id === activeService)
@@ -146,6 +138,7 @@ function App() {
     setActiveService(id)
     setForm((previous) => ({ ...previous, service: id, kind: service.species.includes(previous.kind) ? previous.kind : service.species[0] }))
     setSummary(false)
+    setFormError('')
     // No celular, o painel fica depois dos cards: revelar o conteúdo escolhido.
     if (showDetails && window.matchMedia('(max-width: 850px)').matches) {
       window.requestAnimationFrame(() => {
@@ -158,6 +151,7 @@ function App() {
     const { name, value } = event.target
     setForm((previous) => ({ ...previous, [name]: value }))
     setSummary(false)
+    setFormError('')
   }
   function selectKind(kind) {
     setForm((previous) => ({
@@ -166,15 +160,23 @@ function App() {
       service: services.find((service) => service.id === previous.service)?.species.includes(kind) ? previous.service : services.find((service) => service.species.includes(kind)).id,
     }))
     setSummary(false)
+    setFormError('')
   }
   function selectDay(date) {
     setForm((previous) => ({ ...previous, date, time: '' }))
     setSummary(false)
+    setFormError('')
   }
   function submitForm(event) {
     event.preventDefault()
     if (!event.currentTarget.reportValidity()) return
-    if (!form.date || !form.time || !slotsForDay(form.date).some((slot) => slot.time === form.time && slot.available)) return
+    const validation = validateBooking(form, availableDays, services)
+    if (!validation.ok) {
+      setFormError(validation.reason)
+      return
+    }
+    setFormError('')
+    setForm((previous) => ({ ...previous, tutor: previous.tutor.trim(), pet: previous.pet.trim() }))
     setSummary(true)
   }
   function closeMenu() { setMenuOpen(false) }
@@ -213,7 +215,7 @@ function App() {
             <div className="hero-footnote"><span className="hero-rule"/> UM ESPAÇO PARA O BEM-ESTAR DE CADA PET.</div>
           </div>
           <div className="hero-art">
-            <img className="hero-main-photo" src={photos.hero} alt="Retrato fotográfico de um cão, representando o cuidado e o bem-estar animal" fetchPriority="high" />
+            <img className="hero-main-photo" src={photos.hero} alt="Cão dourado em destaque, símbolo do cuidado MIMO." width="1200" height="1500" fetchPriority="high" decoding="async" />
             <div className="hero-photo-label"><span>01 / MIMO. PET CARE</span><strong>Um cuidado que faz sentir em casa.</strong></div>
           </div>
         </div>
@@ -222,7 +224,7 @@ function App() {
 
       <section id="sobre" className="intro-section section-pad">
         <div className="container intro-layout">
-          <div className="intro-photo"><img src={photos.story} alt="Cães passeando ao ar livre, em um momento de tranquilidade" loading="lazy" decoding="async" /><span>MAIS QUE UM SERVIÇO. UMA RELAÇÃO DE CONFIANÇA.</span></div>
+          <div className="intro-photo"><img src={photos.story} alt="Cães passeando ao ar livre, em um momento de tranquilidade" width="1100" height="1400" loading="lazy" decoding="async" /><span>MAIS QUE UM SERVIÇO. UMA RELAÇÃO DE CONFIANÇA.</span></div>
           <div className="intro-copy"><div className="section-kicker"><span className="tiny-square"/> O NOSSO JEITO</div><h2>Bem-estar é sentir-se <em>em boas mãos.</em></h2><p>No MIMO., imaginamos o cuidado como ele deve ser: tranquilo, individual e cheio de atenção. Um espaço pensado para respeitar o ritmo e a personalidade de cada pet.</p><div className="intro-chips"><span><Icon name="heart" size={18}/> Atenção individual</span><span><Icon name="shield" size={18}/> Respeito ao pet</span><span><Icon name="spark" size={18}/> Experiência acolhedora</span></div></div>
         </div>
       </section>
@@ -240,7 +242,7 @@ function App() {
 
       <section id="galeria" className="gallery-section section-pad"><div className="container"><div className="section-heading"><div><div className="section-kicker"><span className="tiny-square"/> PEQUENOS PROTAGONISTAS</div><h2>Pequenos momentos, <em>grandes histórias.</em></h2></div><p>Uma coleção de imagens ilustrativas que traduzem o universo afetivo do MIMO.</p></div>
         <div className="gallery-toolbar" role="group" aria-label="Filtrar fotos">{[['todos', 'Todos'], ['caes','Cães'], ['gatos', 'Gatos']].map(([id, label]) => <button type="button" key={id} aria-pressed={galleryFilter === id} className={`filter-button ${galleryFilter === id ? 'filter-active' : ''}`} onClick={() => setGalleryFilter(id)}>{label}</button>)}</div>
-        <div className="gallery-grid" aria-live="polite">{filteredGallery.map((item) => <article className={`gallery-card gallery-${item.color}`} key={item.id}><div className="gallery-image"><img src={item.image} alt={`Fotografia ilustrativa: ${item.title}`} loading="lazy" decoding="async" /></div><div className="gallery-caption"><div><span>{item.label.toUpperCase()}</span><h3>{item.title}</h3></div><span className="gallery-star" aria-hidden="true">✳</span></div></article>)}</div>
+        <div className="gallery-grid" aria-live="polite">{filteredGallery.map((item) => <article className={`gallery-card gallery-${item.color}`} key={item.id}><div className="gallery-image"><img src={item.image} alt={`Fotografia ilustrativa: ${item.title}`} width="800" height="1000" loading="lazy" decoding="async" /></div><div className="gallery-caption"><div><span>{item.label.toUpperCase()}</span><h3>{item.title}</h3></div><span className="gallery-star" aria-hidden="true">✳</span></div></article>)}</div>
       </div></section>
 
       <section id="agendar" className="booking-section section-pad"><div className="container booking-grid"><div className="booking-copy"><div className="section-kicker"><span className="tiny-square"/> UMA EXPERIÊNCIA PARA TESTAR</div><h2>Um cuidado especial <em>no seu tempo.</em></h2><p>Escolha o cuidado, uma data e um horário. Tudo de forma simples, como em uma agenda de verdade.</p><div className="booking-note"><Icon name="spark" size={23}/><div><strong>Agenda demonstrativa.</strong><span>Os horários são exemplos fictícios — não indicam vagas reais. Nenhuma informação é enviada ou salva em servidor.</span></div></div></div>
@@ -251,6 +253,7 @@ function App() {
               <div className="field-group"><span className="field-label">Escolha um dia <small>(datas ilustrativas)</small></span><div className="booking-days" role="group" aria-label="Escolher data simulada">{availableDays.map((day) => <button key={day.id} type="button" className={form.date === day.id ? 'is-active' : ''} aria-pressed={form.date === day.id} aria-label={`Selecionar ${day.weekday}, ${day.day} de ${day.month} (data fictícia)`} onClick={() => selectDay(day.id)}><span>{day.weekday}</span><strong>{day.day}</strong><small>{day.month}</small></button>)}</div></div>
               <div className="field-group"><div className="booking-time-header"><span className="field-label">Escolha um horário <small>(disponibilidade fictícia)</small></span><span className="booking-free-count"><i aria-hidden="true" /> {freeSlots} {freeSlots === 1 ? "horário" : "horários"} nesta data</span></div><div className="booking-times" role="group" aria-label="Escolher horário simulado">{dateSlots.map((slot) => <button type="button" key={slot.time} disabled={!slot.available} aria-pressed={form.time === slot.time} aria-label={`${slot.time}${slot.available ? ' disponível nesta demonstração' : ' indisponível nesta demonstração'}`} className={form.time === slot.time ? 'is-active' : ''} onClick={() => {setForm((previous) => ({ ...previous, time: slot.time }));setSummary(false)}}>{slot.time}</button>)}</div><small className="time-caption">Horários riscados estão indisponíveis apenas nesta demonstração.</small></div>
               <div className="booking-recap" role="status" aria-live="polite"><span>RESUMO DA ESCOLHA</span><strong>{selectedCare?.title ?? "Cuidado"} · {form.kind}</strong><p>{form.time && selectedDay ? `${selectedDay.weekday}, ${selectedDay.day} de ${selectedDay.month} às ${form.time}` : "Escolha um horário para revisar a solicitação."}</p></div>
+              {formError && <p className="booking-error" role="alert">{formError}</p>}
               <button type="submit" disabled={!form.time} className="button button-dark booking-submit">Revisar minha solicitação <Icon name="arrow" size={18}/></button><p className="form-footnote">Nenhum horário é reservado. Seus dados ficam apenas nesta tela.</p>
             </form> : <div className="booking-summary" ref={summaryRef} tabIndex="-1"><div className="summary-icon"><Icon name="check" size={30}/></div><h3>Um mimo especial para {form.pet}!</h3><p>Este seria o resumo da sua solicitação:</p><dl><div><dt>Responsável</dt><dd>{form.tutor}</dd></div><div><dt>Pet</dt><dd>{form.pet} · {form.kind} · {form.size}</dd></div><div><dt>Cuidado</dt><dd>{services.find((service) => service.id === form.service)?.title}</dd></div><div><dt>Data</dt><dd>{form.date.split('-').reverse().join('/')}</dd></div><div><dt>Horário</dt><dd>{form.time}</dd></div></dl><div className="summary-notice">Simulação concluída. Nenhuma reserva foi realizada, e este horário não corresponde a uma agenda real.</div><button type="button" onClick={() => setSummary(false)} className="button button-dark booking-submit">Editar solicitação <Icon name="arrow" size={18}/></button></div>}
           </div>
