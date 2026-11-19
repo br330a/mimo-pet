@@ -159,3 +159,21 @@ h2 em,h1 em{font-family:'Playfair Display',serif;font-weight:500;letter-spacing:
 @media(max-width:850px){.services-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.service-details{grid-template-columns:1fr 1fr;column-gap:24px}}
 @media(max-width:580px){.service-filter-bar{margin-top:0}.service-filter-bar button{font-size:11px;padding:10px 11px}.service-card{min-height:174px;padding:15px}.service-card-bottom strong{font-size:17px}.service-card-bottom small{font-size:9px}.service-details{display:flex;flex-direction:column;align-items:stretch;min-height:0;padding:23px}.detail-header{margin-bottom:18px}.service-details h3{font-size:26px;margin:0 0 10px}.service-details p{margin-bottom:15px}.service-details ul{margin:0 0 22px}.service-details .button{max-width:none}.service-details small{margin-top:13px}.booking-days{grid-template-columns:repeat(8,65px)}.booking-times{grid-template-columns:repeat(3,minmax(0,1fr))}.bottom-buttons{flex-direction:column;width:100%;align-items:stretch}.bottom-buttons .button{justify-content:space-between}}
 @media(max-width:580px){.footer-top .brand-paw{left:82px;right:auto}}
+
+/* Refinamento da experiência de escolha / agendamento */
+.service-details{scroll-margin-top:115px}
+.booking-steps{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:27px;padding:11px 13px;border:1px solid #e0e8dd;border-radius:9px;background:#f5f8f2}
+.booking-steps span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;color:#617b67;font-size:10px;font-weight:750}
+.booking-steps b{display:grid;place-items:center;width:23px;height:23px;flex:none;border-radius:50%;background:#dceadd;color:#27523b;font-size:10px}
+.booking-time-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;margin-bottom:10px}
+.booking-time-header .field-label{margin-bottom:0}
+.booking-free-count{display:inline-flex;align-items:center;gap:7px;color:#64836f;font-size:10px;font-weight:700}
+.booking-free-count i{width:7px;height:7px;flex:none;background:#7fb38b;border-radius:50%}
+.booking-recap{margin:20px 0 16px;padding:17px 18px;border-radius:9px;background:#eef4e9;border:1px solid #d8e8d6;color:#315740}
+.booking-recap>span{display:block;font-size:9px;font-weight:800;letter-spacing:.13em;color:#74927c;margin-bottom:7px}
+.booking-recap strong{display:block;font:750 14px/1.4 Manrope,sans-serif;letter-spacing:-.01em}
+.booking-recap p{font-size:12px;color:#607866;margin:6px 0 0;line-height:1.6}
+.booking-days button:hover:not(.is-active),.booking-times button:hover:not(:disabled):not(.is-active){background:#f4f8f3;border-color:#8eb59c}
+.booking-days button:focus-visible,.booking-times button:focus-visible,.choice-group button:focus-visible{outline:3px solid #577f65;outline-offset:2px}
+@media(max-width:580px){.booking-steps{padding:9px 8px;gap:4px}.booking-steps span{font-size:9px;gap:4px}.booking-steps b{width:20px;height:20px;font-size:9px}.booking-recap{margin-top:17px}.booking-time-header{align-items:flex-start;flex-direction:column;gap:7px}}
+@media(max-width:350px){.booking-steps span{font-size:8px}.booking-steps b{width:18px;height:18px}}

@@ -27,3 +27,23 @@
 @media(prefers-reduced-motion:reduce){.product-card,.product-visual svg,.cart-drawer,.cart-overlay{animation:none;transition:none}}
 
 .shop-sr-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Feedback claro no catálogo sem esconder o conteúdo */
+.shop-search{position:relative}
+.shop-clear-search{display:grid;place-items:center;width:28px;height:28px;flex:none;color:#4e7158;background:#eaf2e9;border:0;border-radius:50%;cursor:pointer}
+.shop-clear-search:hover{background:#d8e8d6}
+.product-in-bag{display:inline-flex;align-items:center;margin:0 0 0 8px;padding:4px 7px;border-radius:4px;background:#e9f2e8;color:#35664b;font-size:10px;font-weight:800}
+.product-bottom button:disabled{cursor:not-allowed;opacity:.45;transform:none}
+.shop-toast{position:fixed;z-index:110;bottom:89px;right:22px;width:min(390px,calc(100vw - 28px));display:flex;align-items:center;gap:12px;padding:14px 12px 14px 13px;background:#fffdf8;border:1px solid #d3e0d0;border-radius:13px;box-shadow:0 20px 55px #152e203b;color:#264a36;animation:toastEnter .22s ease}
+.shop-toast-icon{display:grid;place-items:center;width:32px;height:32px;flex:none;border-radius:50%;color:#fff;background:#4e8864}
+.shop-toast>div{flex:1;min-width:0}.shop-toast strong{display:block;font-size:12px;line-height:1.4}.shop-toast small{display:block;color:#6e8373;font-size:11px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shop-toast-view{padding:8px 5px;border:0;border-bottom:1px solid #527f5b;background:none;color:#35674a;font-size:11px;font-weight:850;white-space:nowrap;cursor:pointer}
+.shop-toast-close{display:grid;place-items:center;width:26px;height:26px;flex:none;border:0;background:transparent;color:#839a87;cursor:pointer}
+.cart-drawer{max-height:100dvh}.cart-list{overscroll-behavior:contain}.cart-header-count{display:block;margin-top:6px;color:#7e9682;font-size:10px;font-weight:650}
+.cart-review h3:focus{outline:none}.cart-footer{padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.cart-quantity button:focus-visible,.cart-remove:focus-visible,.shop-toast button:focus-visible,.shop-tabs button:focus-visible,.shop-cart-trigger:focus-visible,.product-bottom button:focus-visible{outline:3px solid #578e65;outline-offset:2px}
+@keyframes toastEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:580px){.shop-toast{bottom:76px;right:14px;padding:11px;gap:8px}.shop-toast-icon{width:29px;height:29px}.shop-toast-view{font-size:10px}.shop-toast strong{font-size:11px}.cart-footer{padding-bottom:max(20px,calc(12px + env(safe-area-inset-bottom)))}}
+@media(prefers-reduced-motion:reduce){.shop-toast{animation:none}}
+
+.shop-search:focus-within{border-color:#729d7c;box-shadow:0 0 0 2px #d5e8d6}

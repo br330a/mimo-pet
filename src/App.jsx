@@ -106,7 +106,7 @@ function Mark({ small = false }) {
 }
 
 function ServiceCard({ item, selected, onSelect }) {
-  return <button className={`service-card tone-${item.tint} ${selected ? 'is-selected' : ''}`} type="button" onClick={() => onSelect(item.id)} aria-pressed={selected}>
+  return <button className={`service-card tone-${item.tint} ${selected ? 'is-selected' : ''}`} type="button" onClick={() => onSelect(item.id, true)} aria-pressed={selected}>
     <span className="service-top"><span>{item.number} / CUIDADO ESPECIAL</span><span className="service-icon"><Icon name={item.icon} size={26}/></span></span>
     <span className="service-card-bottom"><strong>{item.title}</strong><span>{item.subtitle}</span><small>{item.species.join(' · ')}</small></span>
     <span className="service-arrow"><Icon name="northeast" size={20}/></span>
@@ -123,10 +123,14 @@ function App() {
   const [form, setForm] = useState(initialForm)
   const [summary, setSummary] = useState(false)
   const summaryRef = useRef(null)
+  const serviceDetailsRef = useRef(null)
   const active = services.find((service) => service.id === activeService)
   const filteredServices = serviceFilter === 'todos' ? services : services.filter((service) => service.species.includes(serviceFilter))
   const bookingServices = services.filter((service) => service.species.includes(form.kind))
   const dateSlots = form.date ? slotsForDay(form.date) : []
+  const freeSlots = dateSlots.filter((slot) => slot.available).length
+  const selectedDay = availableDays.find((day) => day.id === form.date)
+  const selectedCare = services.find((service) => service.id === form.service)
   const filteredGallery = galleryFilter === 'todos' ? gallery : gallery.filter((item) => item.type === galleryFilter)
 
   useEffect(() => { if (summary) summaryRef.current?.focus() }, [summary])
@@ -136,12 +140,19 @@ function App() {
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [])
 
-  function selectService(id) {
+  function selectService(id, showDetails = false) {
     const service = services.find((item) => item.id === id)
     if (!service) return
     setActiveService(id)
     setForm((previous) => ({ ...previous, service: id, kind: service.species.includes(previous.kind) ? previous.kind : service.species[0] }))
     setSummary(false)
+    // No celular, o painel fica depois dos cards: revelar o conteúdo escolhido.
+    if (showDetails && window.matchMedia('(max-width: 850px)').matches) {
+      window.requestAnimationFrame(() => {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        serviceDetailsRef.current?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
+      })
+    }
   }
   function updateForm(event) {
     const { name, value } = event.target
@@ -220,7 +231,7 @@ function App() {
         <div className="section-heading"><div><div className="section-kicker"><span className="tiny-square"/> NOSSOS CUIDADOS</div><h2>Um cuidado para <em>cada necessidade.</em></h2></div><p>Explore nossos serviços e descubra o que está incluído em cada cuidado.</p></div>
         <div className="service-filter-bar" role="group" aria-label="Filtrar cuidados por animal">{[['todos','Todos os cuidados'],['Cão','Para cães'],['Gato','Para gatos']].map(([id,label]) => <button key={id} type="button" aria-pressed={serviceFilter === id} className={serviceFilter === id ? 'selected' : ''} onClick={() => {setServiceFilter(id);const first = id === 'todos' ? services[0] : services.find((item) => item.species.includes(id));setActiveService(first.id)}}>{label}</button>)}</div>
         <div className="services-layout"><div className="services-grid">{filteredServices.map((item) => <ServiceCard key={item.id} item={item} selected={activeService === item.id} onSelect={selectService}/>)}</div>
-          <div className="service-details" aria-live="polite"><div className="detail-header"><span>SELECIONADO PARA EXPLORAR</span><Icon name="spark" size={21}/></div><div className="detail-icon"><Icon name={active.icon} size={36}/></div><h3>{active.title}</h3><p>{active.description}</p><ul>{active.includes.map((item) => <li key={item}><Icon name="check" size={16}/>{item}</li>)}</ul><a className="button button-light" href="#agendar" onClick={() => selectService(active.id)}>Escolher cuidado e horário <Icon name="arrow" size={18}/></a><small>Seleção demonstrativa, sem confirmação de agendamento real.</small></div></div>
+          <div className="service-details" ref={serviceDetailsRef} aria-live="polite" tabIndex="-1"><div className="detail-header"><span>SELECIONADO PARA EXPLORAR</span><Icon name="spark" size={21}/></div><div className="detail-icon"><Icon name={active.icon} size={36}/></div><h3>{active.title}</h3><p>{active.description}</p><ul>{active.includes.map((item) => <li key={item}><Icon name="check" size={16}/>{item}</li>)}</ul><a className="button button-light" href="#agendar" onClick={() => selectService(active.id)}>Escolher cuidado e horário <Icon name="arrow" size={18}/></a><small>Seleção demonstrativa, sem confirmação de agendamento real.</small></div></div>
       </div></section>
 
       <ShopSection products={products} categories={categories} formatMoney={formatMoney} Icon={Icon}/>
@@ -234,11 +245,12 @@ function App() {
 
       <section id="agendar" className="booking-section section-pad"><div className="container booking-grid"><div className="booking-copy"><div className="section-kicker"><span className="tiny-square"/> UMA EXPERIÊNCIA PARA TESTAR</div><h2>Um cuidado especial <em>no seu tempo.</em></h2><p>Escolha o cuidado, uma data e um horário. Tudo de forma simples, como em uma agenda de verdade.</p><div className="booking-note"><Icon name="spark" size={23}/><div><strong>Agenda demonstrativa.</strong><span>Os horários são exemplos fictícios — não indicam vagas reais. Nenhuma informação é enviada ou salva em servidor.</span></div></div></div>
           <div className="booking-panel"><div className="booking-panel-top"><span>SIMULAÇÃO DE AGENDAMENTO</span><span>SEM RESERVA REAL</span></div>
-            {!summary ? <form className="booking-form" onSubmit={submitForm}><h3>Conte sobre seu pet <span>♡</span></h3><div className="form-row"><label>Seu primeiro nome<input name="tutor" type="text" autoComplete="given-name" maxLength="45" placeholder="Ex.: Ana" required value={form.tutor} onChange={updateForm}/></label><label>Nome do pet<input name="pet" type="text" maxLength="45" placeholder="Ex.: Mel" required value={form.pet} onChange={updateForm}/></label></div>
+            {!summary ? <form className="booking-form" onSubmit={submitForm}><div className="booking-steps" aria-label="Etapas desta simulação"><span><b>01</b> Seu pet</span><span><b>02</b> Cuidado</span><span><b>03</b> Data e hora</span></div><h3>Conte sobre seu pet <span>♡</span></h3><div className="form-row"><label>Seu primeiro nome<input name="tutor" type="text" autoComplete="given-name" maxLength="45" placeholder="Ex.: Ana" required value={form.tutor} onChange={updateForm}/></label><label>Nome do pet<input name="pet" type="text" maxLength="45" placeholder="Ex.: Mel" required value={form.pet} onChange={updateForm}/></label></div>
               <div className="field-group"><span className="field-label">Seu companheiro é um...</span><div className="choice-group">{['Cão', 'Gato'].map((kind) => <button type="button" className={form.kind === kind ? 'is-active' : ''} aria-pressed={form.kind === kind} onClick={() => selectKind(kind)} key={kind}>{kind === 'Cão' ? '🐶' : '🐱'} {kind}</button>)}</div></div>
               <div className="form-row"><label>Porte do pet<select name="size" value={form.size} onChange={updateForm}><option>Pequeno</option><option>Médio</option><option>Grande</option></select></label><label>Cuidado desejado<select name="service" value={form.service} onChange={updateForm}>{bookingServices.map((service) => <option value={service.id} key={service.id}>{service.title}</option>)}</select></label></div>
-              <div className="field-group"><span className="field-label">Escolha um dia <small>(datas ilustrativas)</small></span><div className="booking-days" role="group" aria-label="Escolher data simulada">{availableDays.map((day) => <button key={day.id} type="button" className={form.date === day.id ? 'is-active' : ''} aria-pressed={form.date === day.id} onClick={() => selectDay(day.id)}><span>{day.weekday}</span><strong>{day.day}</strong><small>{day.month}</small></button>)}</div></div>
-              <div className="field-group"><span className="field-label">Escolha um horário <small>(disponibilidade fictícia)</small></span><div className="booking-times" role="group" aria-label="Escolher horário simulado">{dateSlots.map((slot) => <button type="button" key={slot.time} disabled={!slot.available} aria-pressed={form.time === slot.time} className={form.time === slot.time ? 'is-active' : ''} onClick={() => {setForm((previous) => ({ ...previous, time: slot.time }));setSummary(false)}}>{slot.time}</button>)}</div><small className="time-caption">Horários desabilitados são apenas exemplos de ocupação.</small></div>
+              <div className="field-group"><span className="field-label">Escolha um dia <small>(datas ilustrativas)</small></span><div className="booking-days" role="group" aria-label="Escolher data simulada">{availableDays.map((day) => <button key={day.id} type="button" className={form.date === day.id ? 'is-active' : ''} aria-pressed={form.date === day.id} aria-label={`Selecionar ${day.weekday}, ${day.day} de ${day.month} (data fictícia)`} onClick={() => selectDay(day.id)}><span>{day.weekday}</span><strong>{day.day}</strong><small>{day.month}</small></button>)}</div></div>
+              <div className="field-group"><div className="booking-time-header"><span className="field-label">Escolha um horário <small>(disponibilidade fictícia)</small></span><span className="booking-free-count"><i aria-hidden="true" /> {freeSlots} {freeSlots === 1 ? "horário" : "horários"} nesta data</span></div><div className="booking-times" role="group" aria-label="Escolher horário simulado">{dateSlots.map((slot) => <button type="button" key={slot.time} disabled={!slot.available} aria-pressed={form.time === slot.time} aria-label={`${slot.time}${slot.available ? ' disponível nesta demonstração' : ' indisponível nesta demonstração'}`} className={form.time === slot.time ? 'is-active' : ''} onClick={() => {setForm((previous) => ({ ...previous, time: slot.time }));setSummary(false)}}>{slot.time}</button>)}</div><small className="time-caption">Horários riscados estão indisponíveis apenas nesta demonstração.</small></div>
+              <div className="booking-recap" role="status" aria-live="polite"><span>RESUMO DA ESCOLHA</span><strong>{selectedCare?.title ?? "Cuidado"} · {form.kind}</strong><p>{form.time && selectedDay ? `${selectedDay.weekday}, ${selectedDay.day} de ${selectedDay.month} às ${form.time}` : "Escolha um horário para revisar a solicitação."}</p></div>
               <button type="submit" disabled={!form.time} className="button button-dark booking-submit">Revisar minha solicitação <Icon name="arrow" size={18}/></button><p className="form-footnote">Nenhum horário é reservado. Seus dados ficam apenas nesta tela.</p>
             </form> : <div className="booking-summary" ref={summaryRef} tabIndex="-1"><div className="summary-icon"><Icon name="check" size={30}/></div><h3>Um mimo especial para {form.pet}!</h3><p>Este seria o resumo da sua solicitação:</p><dl><div><dt>Responsável</dt><dd>{form.tutor}</dd></div><div><dt>Pet</dt><dd>{form.pet} · {form.kind} · {form.size}</dd></div><div><dt>Cuidado</dt><dd>{services.find((service) => service.id === form.service)?.title}</dd></div><div><dt>Data</dt><dd>{form.date.split('-').reverse().join('/')}</dd></div><div><dt>Horário</dt><dd>{form.time}</dd></div></dl><div className="summary-notice">Simulação concluída. Nenhuma reserva foi realizada, e este horário não corresponde a uma agenda real.</div><button type="button" onClick={() => setSummary(false)} className="button button-dark booking-submit">Editar solicitação <Icon name="arrow" size={18}/></button></div>}
           </div>

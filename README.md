@@ -4,11 +4,11 @@ Vitrine digital fictícia criada em **React + Vite + CSS próprio**, com identid
 
 ## Recursos implementados
 
-- 8 cuidados para cães/gatos, filtráveis e com detalhes;
-- agenda de demonstração com dias futuros e horários simulados (horários indisponíveis são fictícios);
+- 8 cuidados para cães/gatos, filtráveis e com detalhes (no celular, a escolha leva ao painel de explicação);
+- agenda de demonstração com dias futuros e horários simulados, indicação de vagas fictícias e resumo da escolha (horários indisponíveis são fictícios);
 - formulário local com resumo do cuidado, pet, dia e horário, sem envio de informações;
 - MIMO. Shop com 12 produtos fictícios, categorias (cães, gatos, aves, pequenos pets e peixes), busca e carrinho com quantidades e subtotal;
-- painel para revisão **simulada** de pedido: não existe pagamento, transação, estoque, entrega nem coleta de dados;
+- painel para revisão **simulada** de pedido, com feedback de adição, indicadores de quantidade e busca com limpeza rápida: não existe pagamento, transação, estoque, entrega nem coleta de dados;
 - galeria de fotos filtrável, FAQ, navegação responsiva e suporte a teclado e movimento reduzido.
 
 ## Executar e validar
