@@ -1,8 +1,17 @@
-# MIMO. — Pet Care (projeto demonstrativo)
+# MIMO. — Pet Care & Shop (projeto demonstrativo)
 
-Experiência conceitual criada em React + Vite com layout responsivo, filtros de galeria, cards interativos de serviços, perguntas expansíveis e formulário de **simulação local**. Nenhuma reserva é feita nem informações são enviadas para servidores.
+Vitrine digital fictícia criada em **React + Vite + CSS próprio**, com identidade editorial, serviços para cães e gatos, uma agenda de horários de exemplo e um catálogo de produtos para diversos animais.
 
-## Como executar
+## Recursos implementados
+
+- 8 cuidados para cães/gatos, filtráveis e com detalhes;
+- agenda de demonstração com dias futuros e horários simulados (horários indisponíveis são fictícios);
+- formulário local com resumo do cuidado, pet, dia e horário, sem envio de informações;
+- MIMO. Shop com 12 produtos fictícios, categorias (cães, gatos, aves, pequenos pets e peixes), busca e carrinho com quantidades e subtotal;
+- painel para revisão **simulada** de pedido: não existe pagamento, transação, estoque, entrega nem coleta de dados;
+- galeria de fotos filtrável, FAQ, navegação responsiva e suporte a teclado e movimento reduzido.
+
+## Executar e validar
 
 ```bash
 npm install
@@ -11,12 +20,11 @@ npm run lint
 npm run build
 ```
 
-## Fotografia
+## Limitações intencionais da demonstração
 
-As imagens da versão editorial são carregadas externamente do Unsplash (`images.unsplash.com`) e dependem de conexão com a internet. São fotografias ilustrativas, não retratos de pets/clientes do estabelecimento. Para um projeto comercial, substitua por fotografias próprias/contratadas, otimizadas e hospedadas localmente.
+- **Não há agenda real:** os horários são criados localmente por regras fixas, sem consulta ou reserva no servidor. Uma implementação comercial precisaria integrar um sistema de disponibilidade e prevenir agendamentos concorrentes.
+- **Não há e-commerce real:** preços e produtos são ilustrativos. O carrinho só altera o estado local da página e a revisão do pedido não finaliza compra. Para produção seriam necessários estoque, cálculo de frete, pagamento seguro, gestão de pedidos e requisitos legais.
+- **Não há backend, login ou banco de dados.** Dados inseridos na solicitação não são transmitidos.
+- Fotografias editoriais da V2 continuam vindo de `images.unsplash.com` e dependem de internet. São imagens ilustrativas, não fotos de clientes ou animais reais de uma empresa. Em projeto comercial, usar imagens autorizadas e otimizadas sob hospedagem própria. As ilustrações dos **produtos** são SVGs próprios gerados localmente, não dependem de terceiros.
 
-Os ícones SVG do conceito anterior foram mantidos como arquivos em `public/illustrations`, mas não são mais utilizados pelas seções principais.
-
-## Nota sobre o conceito
-
-MIMO. é uma marca fictícia de demonstração. Serviços, imagens, mensagens e formulário não representam atendimento real.
+Este é um **projeto de portfólio**, não uma empresa em operação. Todos os textos, nomes e valores dos produtos são fictícios.
